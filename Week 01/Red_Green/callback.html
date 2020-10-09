@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>红绿灯问题</title>
+  <style>
+    div {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+      border: 1px solid #999;
+      background-color: #999;
+      border-radius: 50%;
+    }
+
+    .red.light {
+      background-color: red;
+    }
+
+    .green.light {
+      background-color: green;
+    }
+
+    .yellow.light {
+      background-color: yellow;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="red"></div>
+  <div class="yellow"></div>
+  <div class="green"></div>
+  <script>
+    const divList = document.getElementsByTagName('div');
+
+    const colorChange = (index) => {
+      for (let i = 0; i < divList.length; i++) {
+        divList[i].classList.remove('light');
+      }
+      divList[index].classList.add('light');
+    }
+
+    // callback：容易造成回调地狱
+    function go() {
+      // 红灯先亮
+      colorChange(0)
+      setTimeout(() => {
+        // 黄灯亮
+        colorChange(1);
+        setTimeout(() => {
+          // 绿灯亮
+          colorChange(2)
+          setTimeout(() => {
+            // 重复执行
+            go();
+          }, 5000);
+        }, 2000);
+      }, 3000);
+    }
+
+  </script>
+</body>
+
+</html>
