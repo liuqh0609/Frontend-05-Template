@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>地图编辑器</title>
+  <style>
+    #map {
+      width: 80vw;
+      margin: 0 auto;
+      display: flex;
+      justify-content: flex-start;
+      align-content: flex-start;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+    }
+
+    .cell {
+      width: 0.8vw;
+      height: 0.8vh;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .operation {
+      position: absolute;
+      right: 1vw;
+      top: 20vh
+    }
+
+    button {
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <div class="operation">
+    <div><button onclick="window.localStorage['map']=JSON.stringify(map)">保存地图</button></div>
+    <div><button onclick="map.fill(0);drawMap();window.localStorage['map']=JSON.stringify(map)">清空地图</button></div>
+  </div>
+  <script src="./index.js"></script>
+</body>
+
+</html>
