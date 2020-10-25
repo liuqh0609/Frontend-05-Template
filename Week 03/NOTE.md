@@ -27,7 +27,7 @@
 
 #### 语法分析
 
-![词法分析](./static/1.png)
+![语法分析产生式](./static/1.png)
 
 一共分为三部分：
 
@@ -36,10 +36,16 @@
 - 终结符（TerminalSymbol）：Number、+、-、\*、/、EOF（End Of File）
 - 非终结符（NoneTerminalSymbol）：AdditiveExpression、MultiplicativeExpression
 
-1. Expression
-   1. 由 AdditiveExpression 和 EOF 组成
-2. AdditiveExpression
-3. MultiplicativeExpression
+1. **Expression**
+   1. `<AdditiveExpression><EOF>`
+2. **AdditiveExpression**
+   1. `<MultiplicativeExpression>`
+   2. `<AdditiveExpression> < + > <MuliplicativeExpression>`
+   3. `<AdditiveExpression> < - > <MuliplicativeExpression>`
+3. **MultiplicativeExpression**
+   1. `<Number>`
+   2. `<MuliplicativeExpression> < * > <Number>`
+   3. `<MuliplicativeExpression> < / > <Number>`
 
 ## Tips
 

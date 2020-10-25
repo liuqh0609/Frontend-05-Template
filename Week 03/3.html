@@ -12,6 +12,7 @@
     const regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
     const dictionary = ["Number", "Whitespace", "LineTerminator", "*", "/", "+", "-"];
 
+    /** 词法解析 */
     function* tokenize(str) {
       let result = null;
       let lastIndex = 0;
@@ -38,21 +39,130 @@
       }
       yield token = { type: 'EOF' }
     }
-
     let source = [];
-    for (let val of tokenize('1024 + 10 * 25')) {
-
+    for (let val of tokenize('1024 + 10')) {
       if (val.type !== 'Whitespace' && val.type !== 'LineTerminator') {
         source.push(val);
       }
     }
+    /** 表达式 */
+    function Expression(source) {
+      // 只有一种产生式
+      if (source[0].type === 'AdditiveExpression' && source[1] && source[1].type === 'EOF') {
+        let node = {
+          type: 'Expression',
+          children: [source.shift(), source.shift()] // 此时AST中应该只有两项，AdditiveExpression和EOF
+        }
+        source.unshift(node);
+        return node;
+      }
+      AdditiveExpression(source);
+      return Expression(source);
+    }
+    /** 加法表达式 */
+    function AdditiveExpression(source) {
+      // 和乘法一样，也是三种产生式
+      // 第一种是<MultiplicativeExpression>
+      if (source[0].type === 'MultiplicativeExpression') {
+        let node = {
+          type: 'AdditiveExpression',
+          children: [source[0]]
+        }
+        source[0] = node;
+        return AdditiveExpression(source);
+      }
+      // 第二种是 <AdditiveExpression><+><MultiplicativeExpression>
+      if (source[0].type === 'AdditiveExpression' && source[1] && source[1].type === '+') {
+        let node = {
+          type: 'AdditiveExpression',
+          operator: '+',
+          children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        // 因为第三个产生式需要是MultiplicativeExpression,所以需要在这里转化一下
+        // 这时source里的前两项已经被shift删除了，所以从第三项开始解析
+        MultiplicativeExpression(source);
+        // 因为实际上的source都是同一个引用值，所以改变之后地址是没变的
+        node.children.push(source.shift());
+        source.unshift(node);
+        return AdditiveExpression(source);
+      }
+      // 第三种是<AdditiveExpression><-><MultiplicativeExpression>
+      if (source[0].type === 'AdditiveExpression' && source[1] && source[1].type === '-') {
+        let node = {
+          type: 'AdditiveExpression',
+          operator: '-',
+          children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        // 因为第三个产生式需要是MultiplicativeExpression,所以需要在这里转化一下
+        // 这时source里的前两项已经被shift删除了，所以从第三项开始解析
+        MultiplicativeExpression(source);
+        // 因为实际上的source都是同一个引用值，所以改变之后地址是没变的
+        node.children.push(source.shift());
+        source.unshift(node);
+        return AdditiveExpression(source);
+      }
 
+      if (source[0].type === 'AdditiveExpression') {
+        return source[0];
+      }
+      MultiplicativeExpression(source);
+      return AdditiveExpression(source);
+    }
+    /** 乘法表达式 */
     function MultiplicativeExpression(source) {
-      console.log(source)
+      // 对于乘法表达式有三种产生式
+      // 第一种是Number
+      if (source[0].type === 'Number') {
+        let node = {
+          type: 'MultiplicativeExpression',
+          children: [source[0]]
+        }
+        source[0] = node;
+        return MultiplicativeExpression(source);
+      }
+      // 第二种是 <MultiplicativeExpression> <*> <Number>
+      if (source[0].type === 'MultiplicativeExpression' && source[1] && source[1].type === '*') {
+        let node = {
+          type: 'MultiplicativeExpression',
+          operator: '*',
+          children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        // 将新的节点放到source的头部
+        source.unshift(node);
+        return MultiplicativeExpression(source);
+      }
+      // 第三种是<MultiplicativeExpression> </> <Number>
+      if (source[0].type === 'MultiplicativeExpression' && source[1] && source[1].type === '/') {
+        let node = {
+          type: 'MultiplicativeExpression',
+          operator: '/',
+          children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        // 将新的节点放到source的头部
+        source.unshift(node);
+        return MultiplicativeExpression(source);
+      }
+
+      // 最后如果source只有一个元素，并且元素type=MultiplicativeExpression时，就完成了转换
+      if (source[0].type === 'MultiplicativeExpression') {
+        return source[0];
+      }
+
+      // 如果以上都没命中的话，就将source转化一下，实际上这一步正常来说是永远不会执行的
+      return MultiplicativeExpression(source);
     }
 
-    MultiplicativeExpression(source)
-
+    console.log(Expression(source))
   </script>
 </body>
 
