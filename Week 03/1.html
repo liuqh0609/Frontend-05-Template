@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LL算法</title>
+</head>
+
+<body>
+  <script>
+    const regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
+    const dictionary = ["Number", "Whitespace", "LineTerminator", "*", "/", "+", "-"];
+
+    function tokenize(str) {
+      let result = null;
+      while (1) {
+        result = regexp.exec(str);
+
+        if (!result) break;
+
+        // 因为exec方法返回的数组中，从第一个元素开始才是对应正则的子表达式所匹配的内容，所以这里从下标1开始检索
+        // exec方法每次匹配到对应元素后，会将
+        for (let i = 1; i < dictionary.length; i++) {
+          if (result[i]) {
+            console.log(dictionary[i - 1])
+          }
+        }
+
+      }
+    }
+    tokenize('1024 + 10 * 25')
+  </script>
+</body>
+
+</html>
