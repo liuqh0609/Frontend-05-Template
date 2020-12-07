@@ -8,10 +8,8 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "program": "${workspaceFolder}/Week 08/toy-brower/client/client.js"
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/Week 08/toy-brower/client/index.js"
     }
   ]
 }

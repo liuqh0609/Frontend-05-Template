@@ -1,25 +1,23 @@
 const { Buffer } = require('buffer');
 const http = require('http');
 
-http
-  .createServer((request, response) => {
-    let body = [];
-
-    request
-      .on('error', (err) => {
-        console.error(err);
-      })
-      .on('data', (chunk) => {
-        console.log('%c 🥝 data: ', 'font-size:20px;background-color: #F5CE50;color:#fff;', data);
-        body.push(chunk.toString());
-      })
-      .on('end', () => {
-        body = Buffer.concat(body).toString();
-        console.log(body);
-        response.writeHead(200, { 'Content-type': 'text/html' });
-        response.end('hellow world');
-      });
-  })
-  .listen(5502);
-
-console.log('server is runing');
+// 创建server服务器对象
+let server = http.createServer();
+//监听对当前服务器对象的请求
+server.on('request', function (req, res) {
+  // 当服务器被请求时，会触发请求事件，并传入请求对象和响应对象
+  res.writeHead(200, { 'Content-type': 'text/html' });
+  const result = {
+    data: 'helloworld',
+  };
+  res.end(JSON.stringify(result)); // 服务器在页面上响应的数据
+});
+server.on('error', (err) => {
+  console.error(err);
+  res.end(err);
+});
+// 服务器监听的端口号
+server.listen(3000, function () {
+  // 启动监听端口号成功时触发
+  console.log('服务器启动成功！');
+});
