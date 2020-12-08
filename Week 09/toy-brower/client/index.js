@@ -1,9 +1,9 @@
 // const Request = require('./request');
+const parse = require('../htmlParse/index');
 /**
  * 构造Request类
  */
 const net = require('net');
-const htmlParse = require('../../../Week 09/toy-brower/htmlParse');
 class Request {
   constructor(options) {
     this.method = options.method || 'GET';
@@ -240,5 +240,7 @@ void (async function () {
     },
   });
   const res = await request.send();
-  htmlParse.parse(res);
+  // 这里是将response处理完成的完整数据交给parseHtml去处理的
+  // 正常情况中的浏览器是通过分段来处理的,就是解析一段处理一段的形式,这里需要注意
+  parse.parseHTML(res);
 })();

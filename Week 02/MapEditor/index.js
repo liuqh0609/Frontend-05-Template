@@ -82,10 +82,9 @@ mapWrapper.addEventListener("contextmenu", (e) => e.preventDefault());
 // 按钮事件
 drawMap();
 
-// 广度优先搜索
+// 启发式搜索
 const path = async (_map, _start, _end) => {
   const queue = new Sorted([_start], (a, b) => distance(a) - distance(b));
-  console.log(queue.length);
   const table = Object.create(_map);
 
   const findAround = (x, y, pre) => {
@@ -109,6 +108,102 @@ const path = async (_map, _start, _end) => {
     await delay(10);
     // 每次取出队列中的第一项
     let [x, y] = queue.take();
+    // 判断该项是不是结束的点,是 ：就停止查找
+    if (x === _end[0] && y === _end[1]) {
+      let _path = [];
+      mapWrapper.children[x * 100 + y].style.backgroundColor = "red";
+      while (x !== _start[0] || y !== _start[1]) {
+        await delay(30);
+        _path.push([x, y]);
+        // 读取存放在table中的上一个点的路径
+        [x, y] = table[x * 100 + y];
+        mapWrapper.children[x * 100 + y].style.backgroundColor = "purple";
+      }
+      return _path;
+    }
+    // 否：查找该点的上下左右四个点
+    findAround(x, y - 1, [x, y]); // 上
+    findAround(x, y + 1, [x, y]); // 下
+    findAround(x - 1, y, [x, y]); // 左
+    findAround(x + 1, y, [x, y]); // 右
+
+    findAround(x - 1, y - 1, [x, y]); // 左上
+    findAround(x + 1, y + 1, [x, y]); // 右下
+    findAround(x - 1, y + 1, [x, y]); // 左下
+    findAround(x + 1, y - 1, [x, y]); // 右上
+  }
+  return null;
+};
+
+// 广度优先搜索
+const pathB = async (_map, _start, _end) => {
+  const queue = [_start];
+  const table = Object.create(_map);
+
+  const findAround = (x, y, pre) => {
+    // 判断临界值
+    if (x >= 100 || x < 0 || y >= 100 || y < 0) return;
+    // 1或者[]证明该点已经搜索过了，不需要进行重复搜索
+    if (table[x * 100 + y]) return;
+
+    mapWrapper.children[x * 100 + y].style.backgroundColor = "green";
+    // 将上一个坐标存储在对应数组位置内，方便寻找路径时读取
+    table[x * 100 + y] = pre;
+    queue.push([x, y]);
+  };
+
+  while (queue.length) {
+    await delay(10);
+    // 每次取出队列中的第一项
+    let [x, y] = queue.shift();
+    // 判断该项是不是结束的点,是 ：就停止查找
+    if (x === _end[0] && y === _end[1]) {
+      let _path = [];
+      mapWrapper.children[x * 100 + y].style.backgroundColor = "red";
+      while (x !== _start[0] || y !== _start[1]) {
+        await delay(30);
+        _path.push([x, y]);
+        // 读取存放在table中的上一个点的路径
+        [x, y] = table[x * 100 + y];
+        mapWrapper.children[x * 100 + y].style.backgroundColor = "purple";
+      }
+      return _path;
+    }
+    // 否：查找该点的上下左右四个点
+    findAround(x, y - 1, [x, y]); // 上
+    findAround(x, y + 1, [x, y]); // 下
+    findAround(x - 1, y, [x, y]); // 左
+    findAround(x + 1, y, [x, y]); // 右
+
+    findAround(x - 1, y - 1, [x, y]); // 左上
+    findAround(x + 1, y + 1, [x, y]); // 右下
+    findAround(x - 1, y + 1, [x, y]); // 左下
+    findAround(x + 1, y - 1, [x, y]); // 右上
+  }
+  return null;
+};
+
+// 深度优先搜索
+const pathD = async (_map, _start, _end) => {
+  const queue = [_start];
+  const table = Object.create(_map);
+
+  const findAround = (x, y, pre) => {
+    // 判断临界值
+    if (x >= 100 || x < 0 || y >= 100 || y < 0) return;
+    // 1或者[]证明该点已经搜索过了，不需要进行重复搜索
+    if (table[x * 100 + y]) return;
+
+    mapWrapper.children[x * 100 + y].style.backgroundColor = "green";
+    // 将上一个坐标存储在对应数组位置内，方便寻找路径时读取
+    table[x * 100 + y] = pre;
+    queue.push([x, y]);
+  };
+
+  while (queue.length) {
+    await delay(10);
+    // 每次取出队列中的第一项
+    let [x, y] = queue.pop();
     // 判断该项是不是结束的点,是 ：就停止查找
     if (x === _end[0] && y === _end[1]) {
       let _path = [];
