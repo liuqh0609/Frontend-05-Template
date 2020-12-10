@@ -10,7 +10,13 @@ server.on('request', function (req, res) {
   // const result = {
   //   data: 'helloworld',
   // };
-  res.end(JSON.stringify('hello world!')); // 服务器在页面上响应的数据
+  const jsx = `<html lang="en">
+<body>
+  <div class="red"></div>
+</body>
+</html>
+`;
+  res.end(JSON.stringify(jsx)); // 服务器在页面上响应的数据
 });
 server.on('error', (err) => {
   console.error(err);
