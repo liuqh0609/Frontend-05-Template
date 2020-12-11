@@ -25,3 +25,7 @@ parse.parseHTML(res);
   - 结束标签
   - 自闭和标签
 - 在这一步忽略属性的计算，只负责处理标签
+
+TIP：
+利用语雀记录笔记：
+链接：[笔记链接](https://www.yuque.com/callmew/iu1ugt/csr8da)

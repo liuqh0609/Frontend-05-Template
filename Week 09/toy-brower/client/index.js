@@ -1,5 +1,5 @@
 // const Request = require('./request');
-const parse = require('./parse');
+const parse = require('../parseHtml/index');
 /**
  * 构造Request类
  */
