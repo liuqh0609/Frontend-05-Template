@@ -1,30 +1,30 @@
 // const Request = require('./request');
-const parse = require('../parseHtml/index');
+const parse = require("../parseHtml/index");
 /**
  * 构造Request类
  */
-const net = require('net');
+const net = require("net");
 class Request {
   constructor(options) {
-    this.method = options.method || 'GET';
+    this.method = options.method || "GET";
     this.url = options.url;
-    this.path = options.path || '/';
+    this.path = options.path || "/";
     this.port = options.port || 80;
     this.headers = options.headers || {};
     this.body = options.body || {};
     // 如果用户没有设置content-type类型，需要给一个默认值
-    if (!this.headers['Content-type']) {
-      this.headers['Content-type'] = 'application/json';
+    if (!this.headers["Content-type"]) {
+      this.headers["Content-type"] = "application/json";
     }
     // 如果是application/json的类型，则把请求体stringify一下
-    if (this.headers['Content-type'] === 'application/json') {
+    if (this.headers["Content-type"] === "application/json") {
       this.bodyText = JSON.stringify(this.body);
     }
     // 如果是x-www-form-urlencode类型
-    if (this.headers['Content-type'] === 'application/x-www-form-urlencode') {
+    if (this.headers["Content-type"] === "application/x-www-form-urlencode") {
       this.bodyText = Object.keys(this.body)
         .map((key) => `${key}=${this.body[key]}`)
-        .join('&');
+        .join("&");
     }
   }
   /**
@@ -50,7 +50,7 @@ class Request {
           }
         );
       }
-      connection.on('data', (data) => {
+      connection.on("data", (data) => {
         const response = data.toString();
         parse.receive(response);
         if (parse.isFinish) {
@@ -59,7 +59,7 @@ class Request {
         connection.end();
       });
       // 捕获错误
-      connection.on('error', (err) => {
+      connection.on("error", (err) => {
         console.error(err);
         connection.end();
       });
@@ -70,7 +70,7 @@ class Request {
     return `${this.method} ${this.path} HTTP/1.1\r
 ${Object.keys(this.headers)
   .map((key) => `${key}: ${this.headers[key]}`)
-  .join('\r\n')}
+  .join("\r\n")}
 \r
 ${this.bodyText}`;
   }
@@ -89,9 +89,9 @@ class ResponseParse {
     this.WAITTING_BODY = 7;
 
     this.current = this.WAITTING_STATUS_LINE; // 初时状态
-    this.statusLine = '';
-    this.headerName = '';
-    this.headerValue = '';
+    this.statusLine = "";
+    this.headerName = "";
+    this.headerValue = "";
     this.headers = {};
     this.bodyParse = null; // 用来缓存body的解析结果
   }
@@ -106,7 +106,7 @@ class ResponseParse {
       statusCode: RegExp.$1,
       statusText: RegExp.$2,
       headers: this.headers,
-      body: this.bodyParse.content.join(''),
+      body: this.bodyParse.content.join(""),
     };
   }
   /**
@@ -124,47 +124,47 @@ class ResponseParse {
    */
   receiveParse(char) {
     if (this.current === this.WAITTING_STATUS_LINE) {
-      if (char === '\r') {
+      if (char === "\r") {
         this.current = this.WAITTING_STATUS_LINE_END;
       } else {
         this.statusLine += char;
       }
     } else if (this.current === this.WAITTING_STATUS_LINE_END) {
-      if (char === '\n') {
+      if (char === "\n") {
         this.current = this.WAITTING_HEADER_NAME;
       }
     } else if (this.current === this.WAITTING_HEADER_NAME) {
-      if (char === ':') {
+      if (char === ":") {
         this.current = this.WAITTING_HEADER_SPACE;
-      } else if (char === '\r') {
+      } else if (char === "\r") {
         // 没有响应头的情况
         this.current = this.WAITTING_HEADER_BLOCK_END;
         // node中的转换编码风格为chuncked，所以我们这里只对这一种情况做处理
-        if (this.headers['Transfer-Encoding'] === 'chunked') {
+        if (this.headers["Transfer-Encoding"] === "chunked") {
           this.bodyParse = new TrunkedBodyParser();
         }
       } else {
         this.headerName += char;
       }
     } else if (this.current === this.WAITTING_HEADER_SPACE) {
-      if (char === ' ') {
+      if (char === " ") {
         this.current = this.WAITTING_HEADER_VALUE;
       }
     } else if (this.current === this.WAITTING_HEADER_VALUE) {
-      if (char === '\r') {
+      if (char === "\r") {
         this.current = this.WAITTING_HEADER_LINE_END;
         this.headers[this.headerName] = this.headerValue;
-        this.headerName = '';
-        this.headerValue = '';
+        this.headerName = "";
+        this.headerValue = "";
       } else {
         this.headerValue += char;
       }
     } else if (this.current === this.WAITTING_HEADER_LINE_END) {
-      if (char === '\n') {
+      if (char === "\n") {
         this.current = this.WAITTING_HEADER_NAME;
       }
     } else if (this.current === this.WAITTING_HEADER_BLOCK_END) {
-      if (char === '\n') {
+      if (char === "\n") {
         this.current = this.WAITTING_BODY;
       }
     } else if (this.current === this.WAITTING_BODY) {
@@ -192,7 +192,7 @@ class TrunkedBodyParser {
    */
   receiveChar(char) {
     if (this.current === this.WAITTING_LENGTH) {
-      if (char === '\r') {
+      if (char === "\r") {
         if (this.length === 0) {
           this.isFinished = true;
         }
@@ -202,22 +202,21 @@ class TrunkedBodyParser {
         this.length += parseInt(char, 16);
       }
     } else if (this.current === this.WAITTING_LENGTH_END) {
-      if (char === '\n') {
+      if (char === "\n") {
         this.current = this.READING_TRUNK;
       }
     } else if (this.current === this.READING_TRUNK) {
-      if (this.isFinished) return;
       this.content.push(char);
       this.length--;
       if (this.length === 0) {
         this.current = this.WAITTING_LENGTH;
       }
     } else if (this.current === this.WAITTING_NEW_LINE) {
-      if (char === '\r') {
+      if (char === "\r") {
         this.current = this.WAITTING_NEW_LINE_END;
       }
     } else if (this.current === this.WAITTING_NEW_LINE_END) {
-      if (char === '\n') {
+      if (char === "\n") {
         this.current = this.WAITTING_LENGTH;
       }
     }
@@ -227,15 +226,15 @@ class TrunkedBodyParser {
 /** 构造requset实例，发送请求 */
 void (async function () {
   const request = new Request({
-    method: 'POST',
-    url: '127.0.0.1',
-    path: '/',
+    method: "POST",
+    url: "127.0.0.1",
+    path: "/",
     port: 3000,
     headers: {
-      'Content-type': 'application/x-www-form-urlencode',
+      "Content-type": "application/x-www-form-urlencode",
     },
     body: {
-      name: '刘庆华',
+      name: "刘庆华",
       age: 23,
     },
   });
