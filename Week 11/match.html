@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      div #sp.cl {
+        display: block;
+        width: 100px;
+        height: 100px;
+        background-color: skyblue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="wrapper">
+      <span id="sp" class="cl"></span>
+    </div>
+
+    <script>
+      function match(selector, e) {
+        console.dir(e);
+        const tagName = e.localName;
+        const className = e.className;
+        const id = e.id;
+        console.log("[ tagName,className ] >", tagName, className, id);
+      }
+      match("div.a", document.getElementById("sp"));
+    </script>
+  </body>
+</html>
