@@ -1,0 +1,14 @@
+{
+  "name": "week18",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc npx mocha --require @babel/register"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@babel/register": "^7.12.13",
+    "mocha": "^8.2.1",
+    "nyc": "^15.1.0"
+  }
+}
