@@ -72,3 +72,4 @@ this.fs.copyTpl(this.templatePath('index.html'), this.destinationPath('public/in
 # babel
 
 babel 是完全独立于 webapck 的一个系统，主要目的就是帮助我们将高版本的 js 处理成为低版本的 js 文件
+
